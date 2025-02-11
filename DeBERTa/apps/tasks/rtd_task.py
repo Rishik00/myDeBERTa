@@ -4,7 +4,7 @@
 #
 
 from glob import glob
-from collections import OrderedDict,defaultdict,
+from collections import OrderedDict,defaultdict
 from collections.abc import Sequence
 from bisect import bisect
 import copy
