@@ -19,7 +19,13 @@ def tokenize_data(input_type, output_path=None, seq_length=512):
         raise ValueError(f"Invalid dataset split: {input_type}. Choose from 'train', 'validation', or 'test'.")
 
     inp = data[input_type]['text']
-    
+    if input_type == 'train':
+        inp = inp[:100000]
+    elif input_type == 'validation':
+        inp = inp[:2000]
+    else:
+        inp = inp[:1000]
+
     # Load tokenizer
     p, t = deberta.load_vocab(vocab_path=None, vocab_type='spm', pretrained_id='deberta-v3-base')
     tokenizer = deberta.tokenizers[t](p)
