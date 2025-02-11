@@ -10,11 +10,11 @@
 import pdb
 from torch.utils.data import Dataset
 import random
-import mmap
 import numpy as np
 from bisect import bisect
 from ..utils import get_logger
-logger=get_logger()
+
+logger = get_logger()
 
 __all__ = ['DynamicDataset']
 
@@ -25,36 +25,35 @@ class DynamicDataset(Dataset):
     logger.info(f'Total corpus examples: {self.ds_len}')
     self.feature_fn = feature_fn
 
-    if not dataset_size:
-      self.dataset_size = self.ds_len
-    else:
-      self.dataset_size = int(dataset_size)
+    self.dataset_size = dataset_size if dataset_size else self.ds_len
+    self.dataset_size = int(self.dataset_size)
 
     self.shuffle = shuffle
-    index_buf = mmap.mmap(-1, self.dataset_size*8)
-    shuffle_idx = np.ndarray(shape=(self.dataset_size, ), buffer=index_buf, dtype=np.int)
-    shuffle_idx[:] = np.arange(self.dataset_size)[:]
+    index_buf = np.zeros(self.dataset_size, dtype=np.int32)
+    shuffle_idx = np.arange(self.dataset_size, dtype=np.int32)
+
     if self.shuffle:
-      #rng = np.random.RandomState(0)
-      rng = random.Random(0)
-      rng.shuffle(shuffle_idx)
+      random.seed(0)
+      random.shuffle(shuffle_idx)
+
     self.shuffle_idx = shuffle_idx
-    self.index_offset = 0
-    if 'index_offset' in kwargs:
-      self.index_offset = kwargs['index_offset']
+    self.index_offset = kwargs.get('index_offset', 0)
 
   def __len__(self):
     return self.dataset_size
 
   def __getitem__(self, idx):
-    if isinstance(idx, tuple) or isinstance(idx, list):
+    if isinstance(idx, (tuple, list)):
       idx, ext_params = idx
     else:
       ext_params = None
+    
+    idx = int(idx)  # Ensure idx is an integer
     idx += self.index_offset
     seed = idx
-    rng = random.Random(seed)
-    # get seq length
-    example_idx = self.shuffle_idx[idx%self.dataset_size]%self.ds_len
-    example = self.corpus[example_idx, rng, ext_params]
-    return self.feature_fn(example, rng, ext_params = ext_params)
+    random.seed(seed)  # Now guaranteed to be an int
+    
+    # Get sequence length
+    example_idx = self.shuffle_idx[idx % self.dataset_size] % self.ds_len
+    example = self.corpus[example_idx]  # Removed incorrect tuple indexing
+    return self.feature_fn(example, ext_params=ext_params)
