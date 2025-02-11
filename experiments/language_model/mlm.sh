@@ -6,7 +6,7 @@ cd $SCRIPT_DIR
 echo "Current Directory: $(pwd)"
 
 cache_dir=model
-max_seq_length=512
+max_seq_length= 16 ## original: 512
 data_dir=$cache_dir/wiki103/
 
 # Ensure necessary directories exist

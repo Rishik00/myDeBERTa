@@ -5,8 +5,8 @@ cd $SCRIPT_DIR
 
 cache_dir=/tmp/DeBERTa/RTD/
 
-max_seq_length=512
-data_dir=$cache_dir/wiki103/spm_$max_seq_length
+max_seq_length= 16 ## original: 512
+data_dir=$cache_dir/wiki103/
 
 function setup_wiki_data(){
 	task=$1
