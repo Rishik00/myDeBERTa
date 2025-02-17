@@ -59,6 +59,7 @@ class RTDModel(NNModule):
       word_bias = torch.nn.Parameter(word_bias)
       position_bias = torch.zeros_like(self.discriminator.deberta.embeddings.position_embeddings.weight)
       position_bias = torch.nn.Parameter(position_bias)
+
       delattr(self.discriminator.deberta.embeddings.word_embeddings, 'weight')
       self.discriminator.deberta.embeddings.word_embeddings.register_parameter('_weight', word_bias)
       delattr(self.discriminator.deberta.embeddings.position_embeddings, 'weight')
