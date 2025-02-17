@@ -12,20 +12,27 @@ def load_wikitext_data():
     return dataset
 
 def load_fineweb_data():
+    """Loads the Fineweb dataset from Hugging Face."""
     login('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')
     dataset = load_dataset("KathirKs/fineweb-edu-hindi", "CC-MAIN-2014-52", trust_remote_code=True)
     return dataset
 
 def tokenize_data(input_type, output_path=None, seq_length=512, vocab_id='deberta-v3-base', dataset_name='wikitext-103'):
-    """Tokenizes and saves Wikitext data."""
+    """Tokenizes and saves dataset based on the input type."""
+    
+    # Load the appropriate dataset based on input
     if dataset_name == 'fineweb':
         data = load_fineweb_data()
-        input_type == 'train'
+        
+        # Default to 'train' split if input_type is not 'train'
+        if input_type not in ['train']:
+            input_type = 'train'
     else:
-       data = load_wikitext_data()
-       
+        data = load_wikitext_data()
+    
     inp = data[input_type]['text']
-    ## Slicing can be removed
+
+    # Handle slicing of input if necessary
     if input_type == 'train':
         inp = inp[:1000]
     elif input_type == 'validation':
@@ -34,7 +41,7 @@ def tokenize_data(input_type, output_path=None, seq_length=512, vocab_id='debert
         inp = inp[3000:3500]
 
     # Load tokenizer
-    p, t = deberta.load_vocab(vocab_path=None, vocab_type='spm', pretrained_id='mdeberta-v3-base')
+    p, t = deberta.load_vocab(vocab_path=None, vocab_type='spm', pretrained_id=vocab_id)
     tokenizer = deberta.tokenizers[t](p)
 
     # Set output file name
@@ -48,25 +55,30 @@ def tokenize_data(input_type, output_path=None, seq_length=512, vocab_id='debert
 
     print(f'Loaded {len(all_tokens)} tokens from {input_type} dataset.')
 
-    # Write tokenized data
+    # Write tokenized data to file
     lines = 0
     with open(output_path, 'w', encoding='utf-8') as wfs:
         idx = 0
         while idx < len(all_tokens):
-            wfs.write(' '.join(all_tokens[idx:idx+seq_length-2]) + '\n')
+            wfs.write(' '.join(all_tokens[idx:idx + seq_length - 2]) + '\n')
             idx += (seq_length - 2)
             lines += 1
 
     print(f'Saved {lines} lines to {output_path}')
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Tokenize Wikitext-103 using DeBERTa tokenizer.")
 
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Tokenize dataset using DeBERTa tokenizer.")
+
+    # Add arguments for the script
     parser.add_argument('-i', '--input', required=True, help="Dataset split to use: 'train', 'validation', or 'test'.")
     parser.add_argument('-o', '--output', default=None, help="Output file path.")
     parser.add_argument('--max_seq_length', type=int, default=512, help="Maximum sequence length.")
     parser.add_argument('--dataset', help='Name of the dataset for preprocessing')
     parser.add_argument('--vocab_id', help='Name of the model for vocab, ex: mdeberta-v3-base')
-    # parser.add_argument('-dp', '--dataset_path', default=None, help="input dataset path.")
+
+    # Parse the arguments
     args = parser.parse_args()
-    tokenize_data(args.input, args.output, args.max_seq_length)
+
+    # Call the function to tokenize data
+    tokenize_data(args.input, args.output, args.max_seq_length, args.vocab_id, args.dataset)
