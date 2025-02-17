@@ -16,15 +16,16 @@ def load_fineweb_data():
     dataset = load_dataset("KathirKs/fineweb-edu-hindi", "CC-MAIN-2014-52", trust_remote_code=True)
     return dataset
 
-def tokenize_data(input_type, output_path=None, seq_length=512):
+def tokenize_data(input_type, output_path=None, seq_length=512, vocab_id='deberta-v3-base', dataset_name='wikitext-103'):
     """Tokenizes and saves Wikitext data."""
-    data = load_fineweb_data()  
-
-    # Check for valid input type
-    # if input_type not in data:
-    #     raise ValueError(f"Invalid dataset split: {input_type}. Choose from 'train', 'validation', or 'test'.")
-
-    inp = data['train']['text']
+    if dataset_name == 'fineweb':
+        data = load_fineweb_data()
+        input_type == 'train'
+    else:
+       data = load_wikitext_data()
+       
+    inp = data[input_type]['text']
+    ## Slicing can be removed
     if input_type == 'train':
         inp = inp[:1000]
     elif input_type == 'validation':
@@ -64,6 +65,8 @@ if __name__ == "__main__":
     parser.add_argument('-i', '--input', required=True, help="Dataset split to use: 'train', 'validation', or 'test'.")
     parser.add_argument('-o', '--output', default=None, help="Output file path.")
     parser.add_argument('--max_seq_length', type=int, default=512, help="Maximum sequence length.")
+    parser.add_argument('--dataset', help='Name of the dataset for preprocessing')
+    parser.add_argument('--vocab_id', help='Name of the model for vocab, ex: mdeberta-v3-base')
     # parser.add_argument('-dp', '--dataset_path', default=None, help="input dataset path.")
     args = parser.parse_args()
     tokenize_data(args.input, args.output, args.max_seq_length)

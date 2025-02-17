@@ -3,10 +3,10 @@ SCRIPT=$(readlink -f "$0")
 SCRIPT_DIR=$(dirname "$SCRIPT")
 cd $SCRIPT_DIR
 
-cache_dir=/tmp/DeBERTa/RTD/
+cache_dir=model
 
-max_seq_length= 16 ## original: 512
-data_dir=$cache_dir/wiki103/
+max_seq_length=16 ## original: 512
+data_dir=$cache_dir/wiki103/ ## can be replaced with your own dataset
 
 function setup_wiki_data(){
 	task=$1

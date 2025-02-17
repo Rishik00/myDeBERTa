@@ -7,7 +7,7 @@ echo "Current Directory: $(pwd)"
 
 cache_dir=model
 max_seq_length=16 ## original: 512
-data_dir=$cache_dir/wiki103/
+data_dir=$cache_dir/fineweb/
 
 # Ensure necessary directories exist
 mkdir -p $cache_dir
@@ -16,7 +16,7 @@ mkdir -p $data_dir
 function setup_wiki_data(){
     mkdir -p $cache_dir
     if [[ ! -e  $cache_dir/spm.model ]]; then
-        wget -q https://huggingface.co/microsoft/deberta-v3-base/resolve/main/spm.model -O $cache_dir/spm.model
+        wget -q https://huggingface.co/microsoft/mdeberta-v3-base/resolve/main/spm.model -O $cache_dir/spm.model
     fi
 
     # if [[ ! -e  $data_dir/test.txt ]]; then
@@ -48,6 +48,15 @@ case ${init,,} in
 	deberta-base)
 	parameters=" --num_train_epochs 1 \
 	--model_config deberta_base.json \
+	--warmup 1 \
+	--learning_rate 1e-4 \
+	--train_batch_size 256 \
+	--max_ngram 3 \
+	--fp16 True "
+		;;
+    mdeberta-base)
+	parameters=" --num_train_epochs 1 \
+	--model_config mdeberta_base.json \
 	--warmup 1 \
 	--learning_rate 1e-4 \
 	--train_batch_size 256 \
