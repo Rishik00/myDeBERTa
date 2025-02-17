@@ -2,6 +2,7 @@
 from DeBERTa import deberta
 import sys
 import argparse
+from huggingface_hub import login
 from datasets import load_dataset
 from tqdm import tqdm
 
@@ -10,24 +11,29 @@ def load_wikitext_data():
     dataset = load_dataset("wikitext", "wikitext-103-v1")
     return dataset
 
+def load_fineweb_data():
+    login('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')
+    dataset = load_dataset("KathirKs/fineweb-edu-hindi", "CC-MAIN-2014-52", trust_remote_code=True)
+    return dataset
+
 def tokenize_data(input_type, output_path=None, seq_length=512):
     """Tokenizes and saves Wikitext data."""
-    data = load_wikitext_data()
+    data = load_fineweb_data()  
 
     # Check for valid input type
-    if input_type not in data:
-        raise ValueError(f"Invalid dataset split: {input_type}. Choose from 'train', 'validation', or 'test'.")
+    # if input_type not in data:
+    #     raise ValueError(f"Invalid dataset split: {input_type}. Choose from 'train', 'validation', or 'test'.")
 
-    inp = data[input_type]['text']
+    inp = data['train']['text']
     if input_type == 'train':
-        inp = inp[:100000]
-    elif input_type == 'validation':
-        inp = inp[:2000]
-    else:
         inp = inp[:1000]
+    elif input_type == 'validation':
+        inp = inp[1000:2000]
+    else:
+        inp = inp[3000:3500]
 
     # Load tokenizer
-    p, t = deberta.load_vocab(vocab_path=None, vocab_type='spm', pretrained_id='deberta-v3-base')
+    p, t = deberta.load_vocab(vocab_path=None, vocab_type='spm', pretrained_id='mdeberta-v3-base')
     tokenizer = deberta.tokenizers[t](p)
 
     # Set output file name
