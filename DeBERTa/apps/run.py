@@ -73,6 +73,7 @@ def train_model(args, model, device, train_data, eval_data, run_eval_fn, train_f
   def get_adv_loss_fn():
     adv_modules = hook_sift_layer(model, hidden_size=model.config.hidden_size, learning_rate=args.vat_learning_rate, init_perturbation=args.vat_init_perturbation)
     adv = AdversarialLearner(model, adv_modules)
+
     def adv_loss_fn(trainer, model, data):
       output = model(**data)
       logits = output['logits']
@@ -123,10 +124,12 @@ def calc_metrics(predicts, labels, eval_loss, eval_item, eval_results, args, nam
   result['eval_loss'] = eval_loss
   result['eval_metric'] = eval_metric
   result['eval_samples'] = len(labels)
+
   if args.rank<=0:
     output_eval_file = os.path.join(args.output_dir, "eval_results_{}_{}.txt".format(name, prefix))
     with open(output_eval_file, 'w', encoding='utf-8') as writer:
       logger.info("***** Eval results-{}-{} *****".format(name, prefix))
+      
       for key in sorted(result.keys()):
         logger.info("  %s = %s", key, str(result[key]))
         writer.write("%s = %s\n" % (key, str(result[key])))
@@ -135,18 +138,23 @@ def calc_metrics(predicts, labels, eval_loss, eval_item, eval_results, args, nam
     if predict_fn is not None:
       predict_fn(predicts, args.output_dir, name, prefix)
     else:
+      
       output_predict_file = os.path.join(args.output_dir, "predict_results_{}_{}.txt".format(name, prefix))
       np.savetxt(output_predict_file, predicts, delimiter='\t')
+      
       output_label_file = os.path.join(args.output_dir, "predict_labels_{}_{}.txt".format(name, prefix))
       np.savetxt(output_label_file, labels, delimiter='\t')
 
   if not eval_item.ignore_metric:
     eval_results[name]=(eval_metric, predicts, labels)
   _tag = tag + '/' if tag is not None else ''
+  
   def _ignore(k):
     ig = ['/eval_samples', '/eval_loss']
+  
     for i in ig:
       if k.endswith(i):
+  
         return True
     return False
 
@@ -293,19 +301,26 @@ def main(args):
 
   if args.do_train:
     train_data = task.train_data(max_seq_len=args.max_seq_length, debug=args.debug)
+
   model_class_fn = task.get_model_class_fn()
   model = create_model(args, len(label_list), model_class_fn)
+  
   if args.do_train:
+  
     with open(os.path.join(args.output_dir, 'model_config.json'), 'w', encoding='utf-8') as fs:
       fs.write(model.config.to_json_string() + '\n')
     shutil.copy(vocab_path, args.output_dir)
+  
   logger.info("Model config {}".format(model.config))
   device = initialize_distributed(args)
+  
   if not isinstance(device, torch.device):
     return 0
+  
   model.to(device)
   run_eval_fn = task.get_eval_fn()
   loss_fn = task.get_loss_fn(args)
+  
   if run_eval_fn is None:
     run_eval_fn = run_eval
   

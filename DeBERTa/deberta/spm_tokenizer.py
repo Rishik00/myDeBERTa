@@ -26,15 +26,18 @@ class SPMTokenizer:
   def __init__(self, vocab_file, do_lower_case=False, special_tokens=None, bpe_dropout=0, split_by_punct=False):
     self.split_by_punct = split_by_punct
     spm = sp.SentencePieceProcessor()
+
     assert os.path.exists(vocab_file)
     spm.load(vocab_file)
     bpe_vocab_size = spm.GetPieceSize()
+    
     # Token map
     # <unk> 0+1
     # <s> 1+1
     # </s> 2+1
     self.vocab = {spm.IdToPiece(i):i for i in range(bpe_vocab_size)}
     self.id_to_tokens = [spm.IdToPiece(i) for i in range(bpe_vocab_size)]
+
     #self.vocab['[PAD]'] = 0
     #self.vocab['[CLS]'] = 1
     #self.vocab['[SEP]'] = 2
@@ -145,18 +148,23 @@ class SPMTokenizer:
     words = []
     offset = 0
     prev_end = 0
+
     for i,p in enumerate(pieces):
       if p.startswith(word_start):
         if offset>prev_end:
+    
           words.append(text[prev_end:offset])
         prev_end = offset
         w = p.replace(word_start, '')
+    
       else:
         w = p
+    
       try:
         s = text.index(w, offset)
         pn = ""
         k = i+1
+    
         while k < len(pieces):
           pn = pieces[k].replace(word_start, '')
           if len(pn)>0:
@@ -255,7 +263,6 @@ class SPMTokenizer:
         output.append(char)
     return "".join(output)
 
-
 def _is_whitespace(char):
     """Checks whether `chars` is a whitespace character."""
     # \t, \n, and \r are technically contorl characters but we treat them
@@ -319,4 +326,3 @@ def convert_to_unicode(text):
       raise ValueError("Unsupported string type: %s" % (type(text)))
   else:
     raise ValueError("Not running on Python2 or Python 3?")
-

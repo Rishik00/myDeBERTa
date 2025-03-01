@@ -47,6 +47,15 @@ case ${init,,} in
 	--decoupled_training True \
 	--fp16 True "
 		;;
+	mdeberta-v3-xsmall)
+	parameters=" --num_train_epochs 1 \
+	--model_config rtd_mxsmall.json \
+	--warmup 10000 \
+	--learning_rate 3e-4 \
+	--train_batch_size 64 \
+	--decoupled_training True \
+	--fp16 True "
+		;;
 	deberta-v3-small-continue)
 	# wget https://huggingface.co/microsoft/deberta-v3-small/resolve/main/pytorch_model.generator.bin
 	# wget https://huggingface.co/microsoft/deberta-v3-small/resolve/main/pytorch_model.bin

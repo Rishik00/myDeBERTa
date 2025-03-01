@@ -116,11 +116,14 @@ def load_vocab(vocab_path=None, vocab_type=None, pretrained_id=None, tag=None, n
     pretrained = pretrained_models[pretrained_id.lower()]
     if not cache_dir:
       cache_dir = os.path.join(pathlib.Path.home(), f'.~DeBERTa/assets/{_tag}/{pretrained.name}')
+    
     os.makedirs(cache_dir, exist_ok=True)
     vocab_type = pretrained.vocab_type
     url = pretrained.vocab_url
+    
     outname = os.path.basename(url)
     vocab_path =os.path.join(cache_dir, outname)
+    
     if (not os.path.exists(vocab_path)) or no_cache:
       asset = download_asset(url, outname, tag=tag, no_cache=no_cache, cache_dir=cache_dir)
   if vocab_type is None:
