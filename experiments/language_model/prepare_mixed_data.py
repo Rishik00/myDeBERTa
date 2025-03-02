@@ -43,7 +43,7 @@ def load_data_via_streaming():
     return file_name
 
 
-def tokenize_data(split_name, output_path, seq_length=512, vocab_path=None):
+def tokenize_data(split_name, output_path=None, seq_length=512, vocab_id='deberta-v3-base'):
     file_name = load_data_via_streaming()
     with open(file_name, 'r') as f:
         inp = f.readlines()
@@ -55,8 +55,12 @@ def tokenize_data(split_name, output_path, seq_length=512, vocab_path=None):
     else:
         inp = inp[3500:5000]
     
-    p, t = deberta.load_vocab(vocab_path=vocab_path, vocab_type='spm')
+    p, t = deberta.load_vocab(vocab_path=None, vocab_type='spm', pretrained_id=vocab_id)
     tokenizer = deberta.tokenizers[t](p)
+
+    # Set output file name
+    if output_path is None:
+        output_path = f"{split_name}.spm"
 
     all_tokens = []
     for line in tqdm(inp, ncols=80, desc=f'Loading {split_name} set'):
