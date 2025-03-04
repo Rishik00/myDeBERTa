@@ -1,15 +1,60 @@
 from DeBERTa import deberta
+import os
 import argparse
 from huggingface_hub import login
 from datasets import load_dataset
 from tqdm import tqdm
 
+def load_indic_data_while_streaming():
+    num_en_train = 1210
+    num_hi_train = 1650
+
+    file_name = 'c4/mixed.txt'
+    temp_files = ['en.txt', 'hi.txt']
+
+    if os.path.exists(file_name):
+        return file_name
+
+    en_data = load_dataset("ai4bharat/sangraha", data_dir="verified/eng", streaming=True)
+    with open(temp_files[0], 'w') as enfile:
+        for i, sample in enumerate(en_data):
+            if i >= num_en_train:
+                break
+            cleaned_row = sample['text'].split('.')
+            for row in cleaned_row:
+                if len(row.split()) >= 3:
+                    enfile.write(row + '\n')
+ 
+    hi_data = load_dataset("ai4bharat/sangraha", data_dir="verified/hin", streaming=True)
+    with open(temp_files[1], 'w') as hifile:
+        for i, sample in enumerate(hi_data):
+            if i >= num_hi_train:
+                break
+            cleaned_row = sample['text'].split('।')
+            for row in cleaned_row:
+                if len(row.split()) >= 3:
+                    hifile.write(row + '\n')
+
+    with open(temp_files[0], 'r') as file0, open(temp_files[1], 'r') as file1:
+        eng_sentences = file0.readlines()
+        hin_sentences = file1.readlines()
+
+    with open(file_name, 'w') as ofile:
+        for eng, hin in zip(eng_sentences, hin_sentences):
+            ofile.write(eng.strip() + '\n')
+            ofile.write(hin.strip() + '\n')
+
+    return file_name
+
 def load_data_via_streaming():
     num_en_train = 1210
     num_hi_train = 1650
 
-    file_name = 'mixeed.txt'
+    file_name = 'c4/mixed.txt'
     temp_files = ['en.txt', 'hi.txt']
+
+    if os.path.exists(file_name):
+        return file_name
 
     en_data = load_dataset("allenai/c4", 'en', split='train', streaming=True)
     with open(temp_files[0], 'w') as enfile:
@@ -42,9 +87,9 @@ def load_data_via_streaming():
 
     return file_name
 
-
 def tokenize_data(split_name, output_path=None, seq_length=512, vocab_id='deberta-v3-base'):
     file_name = load_data_via_streaming()
+    print(f'coming here for {split_name}')
     with open(file_name, 'r') as f:
         inp = f.readlines()
 
