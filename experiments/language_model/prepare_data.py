@@ -13,31 +13,36 @@ def load_wikitext_data():
 
 def load_fineweb_data():
     """Loads the Fineweb dataset from Hugging Face."""
+
     login('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')
     dataset = load_dataset("KathirKs/fineweb-edu-hindi", "CC-MAIN-2014-52", trust_remote_code=True)
     return dataset
 
-def tokenize_data(input_type, output_path=None, seq_length=512, vocab_id='deberta-v3-base', dataset_name='wikitext-103'):
+def tokenize_data(input_type, output_path=None, seq_length=512, vocab_id='deberta-v3-base', dataset_name='wikitext-103', vocab_path=None):
     """Tokenizes and saves dataset based on the input type."""
     
     # Load the appropriate dataset based on input
     if dataset_name == 'fineweb':
         data = load_fineweb_data()
-        
         # Default to 'train' split if input_type is not 'train'
         if input_type not in ['train']:
             input_type = 'train'
+    
     else:
         data = load_wikitext_data()
-    
+
+    print(f'input type: {input_type}')
     inp = data[input_type]['text']
 
     # Handle slicing of input if necessary
     if input_type == 'train':
+        print("Entering here for training")
         inp = inp[:1000]
     elif input_type == 'validation':
+        print("Entering here for validation")
         inp = inp[1000:2000]
     else:
+        print("Entering for test set")
         inp = inp[3000:3500]
 
     # Load tokenizer
@@ -76,9 +81,9 @@ if __name__ == "__main__":
     parser.add_argument('--max_seq_length', type=int, default=512, help="Maximum sequence length.")
     parser.add_argument('--dataset', help='Name of the dataset for preprocessing')
     parser.add_argument('--vocab_id', help='Name of the model for vocab, ex: mdeberta-v3-base')
-
+    parser.add_argument('--vocab_path',help='Path of the model vocab for vocab, ex: mdeberta-v3-base')
     # Parse the arguments
     args = parser.parse_args()
 
     # Call the function to tokenize data
-    tokenize_data(args.input, args.output, args.max_seq_length, args.vocab_id, args.dataset)
+    tokenize_data(args.input, args.output, args.max_seq_length, args.vocab_id, args.dataset, args.vocab_path)
