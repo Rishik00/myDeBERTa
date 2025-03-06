@@ -26,13 +26,13 @@ def tokenize_data(input_type, output_path=None, seq_length=512, vocab_id='debert
         data = load_fineweb_data()
         # Default to 'train' split if input_type is not 'train'
         if input_type not in ['train']:
-            input_type = 'train'
+            input_chunk = 'train'
     
     else:
         data = load_wikitext_data()
 
     print(f'input type: {input_type}')
-    inp = data[input_type]['text']
+    inp = data[input_chunk]['text']
 
     # Handle slicing of input if necessary
     if input_type == 'train':
