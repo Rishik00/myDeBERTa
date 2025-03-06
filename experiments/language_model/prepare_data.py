@@ -22,6 +22,7 @@ def tokenize_data(input_type, output_path=None, seq_length=512, vocab_id='debert
     """Tokenizes and saves dataset based on the input type."""
     
     # Load the appropriate dataset based on input
+    input_chunk = None
     if dataset_name == 'fineweb':
         data = load_fineweb_data()
         # Default to 'train' split if input_type is not 'train'
@@ -30,6 +31,7 @@ def tokenize_data(input_type, output_path=None, seq_length=512, vocab_id='debert
     
     else:
         data = load_wikitext_data()
+        input_chunk = input_type
 
     print(f'input type: {input_type}')
     inp = data[input_chunk]['text']
