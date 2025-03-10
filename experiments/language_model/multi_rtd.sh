@@ -97,6 +97,15 @@ case ${init,,} in
 	--decoupled_training True \
 	--fp16 True "
 		;;
+	mdeberta-v3-large)
+	parameters=" --num_train_epochs 1 \
+	--model_config rtd_large.json \
+	--warmup 10000 \
+	--learning_rate 1e-4 \
+	--train_batch_size 256 \
+	--decoupled_training True \
+	--fp16 True "
+		;;
 	*)
 		echo "usage $0 <Pretrained model configuration>"
 		echo "Supported configurations"
@@ -106,6 +115,18 @@ case ${init,,} in
 		exit 0
 		;;
 esac
+
+# python -m DeBERTa.apps.run --model_config config.json  \
+# 	--tag $tag \
+# 	--do_train \
+# 	--num_training_steps 10000 \
+# 	--max_seq_len $max_seq_length \
+# 	--dump 1000 \
+# 	--task_name $Task \
+# 	--data_dir $data_dir \
+# 	--vocab_path $cache_dir/spm.model \
+# 	--vocab_type spm \
+# 	--output_dir /tmp/ttonly/$tag/$task  $parameters
 
 python -m DeBERTa.apps.run --model_config config.json  \
 	--tag $tag \

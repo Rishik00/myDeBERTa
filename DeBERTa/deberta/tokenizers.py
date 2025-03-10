@@ -13,4 +13,4 @@ __all__ = ['tokenizers']
 tokenizers={
     'gpt2': GPT2Tokenizer,
     'spm': SPMTokenizer
-    }
+}

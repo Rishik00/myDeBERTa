@@ -30,7 +30,7 @@ case ${init,,} in
 	bert-base)
 	parameters=" --num_train_epochs 1 \
 	--model_config bert_base.json \
-	--warmup 1 \
+	--warmup 10000 \
 	--learning_rate 1e-4 \
 	--train_batch_size 256 \
 	--max_ngram 1 \
@@ -39,7 +39,7 @@ case ${init,,} in
 	deberta-base)
 	parameters=" --num_train_epochs 1 \
 	--model_config deberta_base.json \
-	--warmup 1 \
+	--warmup 10000 \
 	--learning_rate 1e-4 \
 	--train_batch_size 256 \
 	--max_ngram 3 \
@@ -48,7 +48,7 @@ case ${init,,} in
     mdeberta-base)
 	parameters=" --num_train_epochs 1 \
 	--model_config mdeberta_base.json \
-	--warmup 1 \
+	--warmup 10000 \
 	--learning_rate 1e-4 \
 	--train_batch_size 256 \
 	--max_ngram 3 \
@@ -57,7 +57,7 @@ case ${init,,} in
 	xlarge-v2)
 	parameters=" --num_train_epochs 1 \
 	--model_config deberta_xlarge.json \
-	--warmup 1000 \
+	--warmup 10000 \
 	--learning_rate 1e-4 \
 	--train_batch_size 32 \
 	--max_ngram 3 \
@@ -65,7 +65,7 @@ case ${init,,} in
 		;;
 	xxlarge-v2)
 	parameters=" --num_train_epochs 1 \
-	--warmup 1000 \
+	--warmup 10000 \
 	--model_config deberta_xxlarge.json \
 	--learning_rate 1e-4 \
 	--train_batch_size 32 \
@@ -82,6 +82,18 @@ case ${init,,} in
 		exit 0
 		;;
 esac
+
+# python -m DeBERTa.apps.run --model_config config.json  \
+# 	--tag $tag \
+# 	--do_train \
+# 	--num_training_steps 10000 \
+# 	--max_seq_len $max_seq_length \
+# 	--dump 1000 \
+# 	--task_name $Task \
+# 	--data_dir $data_dir \
+# 	--vocab_path $cache_dir/spm.model \
+# 	--vocab_type spm \
+# 	--output_dir /tmp/ttonly/$tag/$task  $parameters
 
 python -m DeBERTa.apps.run --model_config config.json  \
 	--tag $tag \

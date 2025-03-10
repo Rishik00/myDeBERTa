@@ -24,6 +24,8 @@ def tokenize_data(input_type, output_path=None, seq_length=512, vocab_id='debert
         input_chunk = input_type if input_type in data else 'train'  # Preserve correct dataset split
         if input_chunk != input_type:
             print(f"[WARNING] {input_type} not found in fineweb dataset. Defaulting to 'train'.")
+    elif dataset_name == 'ai4b':
+        pass
     else:
         data = load_wikitext_data()
         if input_type not in data:

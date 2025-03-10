@@ -13,4 +13,5 @@ psutil
 sentencepiece
 #GitPython
 torch
+python-Levenshtein
 #torchvision
