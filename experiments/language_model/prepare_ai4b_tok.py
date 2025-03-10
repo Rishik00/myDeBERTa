@@ -36,24 +36,24 @@ def clean_text(row: str, lang: str):
     return cleaner.split_row(cleaned_text)
 
 def save_file(inp_file, dataset, lang, num_rows):
-    with open(inp_file, 'w', encoding='urf-8') as f:
+    with open(inp_file, 'w', encoding='utf-8') as f:
         count = 0
         for idx, sample in enumerate(dataset['train']):
 
             if idx >= num_rows:
               break
             is_hindi = lang == 'hi'
-            cleaned_text = clean_text(sample['text'], is_hindi)
+            cleaned_text = clean_text(sample['text'], lang)
 
-            if lang == 'en' and len(cleaned_text.split(' ')) >= 3:
+            if lang == 'en':
                 for sentence in cleaned_text:
                     f.write(sentence + "\n")
                     count += 1
 
-            if lang == 'hi' and len(cleaned_text.split(' ')) >= 1:
+            if lang == 'hi':
                 for sentence in cleaned_text:
                     f.write(sentence + "\n")
-                count += 1
+                    count += 1
 
     print(f'Written {count} rows into {inp_file}')
     return count
@@ -75,7 +75,6 @@ def mix_files(en_file, hi_file, ofile):
     print(f'Done writing sentences to {final_file_name}')
     print(f"Total English sentences: {len(eng_sentences)}")
     print(f"Total Hindi sentences: {len(hin_sentences)}")
-
 
 def train_sentencepiece(input_file, model_prefix, vocab_size=10000):
     """Train SentencePiece model with appropriate parameters for mDeBERTa."""
